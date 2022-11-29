@@ -98,9 +98,6 @@
                 box-shadow: 6px 4px 44px 2px rgba(0, 0, 0, 0.24);
             }
         </style>
-
-        <link rel="stylesheet" href="popup.css">
-        <script src="popup.js"></script>
     </head>
 
     <body>
@@ -136,8 +133,6 @@
             </div>
         </div>
 
-        <div id="popup"></div>
-
         <script>
             const port = (location.port == "") ? "" : (":" + location.port);
 
@@ -153,11 +148,11 @@
                 {
                     if (responseText == "sign up fail")
                     {
-                        popup("This username already exists!");
+                        alert("This username already exists!");
                     }
                     else if (responseText == "sign up success")
                     {
-                        popup("Sign up successfully!");
+                        alert("Sign up successfully!");
                     }
                 });
             }
@@ -174,7 +169,7 @@
                 {
                     if (responseText == "sign in fail")
                     {
-                        popup("Wrong username or password!");
+                        alert("Wrong username or password!");
                     }
                     else if (responseText == "sign in success")
                     {
