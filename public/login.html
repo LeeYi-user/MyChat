@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+
+        <style>
+            *
+            {
+                padding:0;
+                margin:0;
+                font-family: sans-serif;
+            }
+
+            body
+            {
+                background-color:DodgerBlue;
+            }
+
+            .box
+            {
+                width:100%;
+                height:100vh;
+                display:flex;
+                background-color:rgba(0,0,0,0.5);
+            }
+
+            .login-box
+            {
+                width:800px;
+                top:40%;
+                left:50%;
+                transform: translate(-50%,-50%);
+                -webkit-transform: translate(-50%,-50%);
+                position:absolute;
+                color:#fff;
+            }
+
+            .login-box h1
+            {
+                font-size:100px;
+                text-align:center;
+                margin:80px 0;
+            }
+
+            .login-box p
+            {
+                font-size:40px;
+                margin: 30px 0;
+                color:white;
+            }
+
+            .login-box-input
+            {
+                font-size:32px;
+                width:100%;
+                padding: 30px 20px;
+                box-sizing: border-box;
+                border:0;
+                outline:none;
+                border-radius: 14px;
+            }
+
+            .login-box-input:focus
+            {
+                box-shadow: 0 0 0 6px DodgerBlue;
+            }
+
+            .login-box-input:focus::placeholder
+            {
+                color: transparent;
+            }
+
+            .styled
+            {
+                width: 100%;
+                text-decoration: none;
+                border: none;
+                padding: 40px 80px;
+                font-size: 2rem;
+                background-color: DodgerBlue;
+                color: #fff;
+                border-radius: 20px;
+                box-shadow: 14px 12px 56px 2px rgba(0, 0, 0, 0.24);
+                cursor: pointer;
+                outline: none;
+                transition: 0.2s all;
+            }
+
+            .styled:hover
+            {
+                background-color: rgba(30, 144, 255, 0.5);
+            }
+
+            .styled:active
+            {
+                transform: scale(0.98);
+                box-shadow: 6px 4px 44px 2px rgba(0, 0, 0, 0.24);
+            }
+        </style>
+
+        <link rel="stylesheet" href="popup.css">
+        <script src="popup.js"></script>
+    </head>
+
+    <body>
+        <div class="box">
+            <div class="login-box">
+                <br></br>
+
+                <h1> Welcome </h1>
+
+                <br></br>
+
+                <br></br>
+
+                <form id="form">
+                    <input class="login-box-input" type="text" name="username" id="username" placeholder="Username">
+
+                    <br></br>
+
+                    <input class="login-box-input" type="password" name="password" id="password" placeholder="Password">
+
+                    <br></br>
+
+                    <br></br>
+
+                    <br></br>
+
+                    <input class="styled" type="button" value="Sign In" onclick="sign_in()">
+
+                    <br></br>
+
+                    <input class="styled" type="button" value="Sign Up" onclick="sign_up()">
+                </form>
+            </div>
+        </div>
+
+        <div id="popup"></div>
+
+        <script>
+            const port = (location.port == "") ? "" : (":" + location.port);
+
+            async function sign_up()
+            {
+                const request = await fetch(location.protocol + "//" + location.hostname + port + "/sign_up",
+                {
+                    method: "POST",
+                    body: new FormData(document.getElementById("form"))
+                });
+
+                request.text().then((responseText) =>
+                {
+                    if (responseText == "sign up fail")
+                    {
+                        popup("This username already exists!");
+                    }
+                    else if (responseText == "sign up success")
+                    {
+                        popup("Sign up successfully!");
+                    }
+                });
+            }
+
+            async function sign_in()
+            {
+                const request = await fetch(location.protocol + "//" + location.hostname + port + "/sign_in",
+                {
+                    method: "POST",
+                    body: new FormData(document.getElementById("form"))
+                });
+
+                request.text().then((responseText) =>
+                {
+                    if (responseText == "sign in fail")
+                    {
+                        popup("Wrong username or password!");
+                    }
+                    else if (responseText == "sign in success")
+                    {
+                        location.replace("/public/home.html");
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>

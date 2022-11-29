@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+        <style>
+            *
+            {
+                margin:0;
+                padding:10;
+                font-family: sans-serif;
+                box-sizing:border-box;
+            }
+
+            .box
+            {
+                width:auto;
+                height:100vh;
+                display:flex;
+                flex-direction:column;
+                background-color:DodgerBlue;
+            }
+
+            .body
+            {
+                flex:2;
+                color:white;
+                background-color:rgba(0,0,0,0.5);
+                padding:20px 25px;
+                overflow-y: auto;
+                word-wrap: break-word;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            .body::-webkit-scrollbar
+            {
+                display: none;
+            }
+
+            .message
+            {
+                background-color: DodgerBlue;
+                padding:10px;
+                color:white;
+                width: -webkit-fit-content;
+                width: -moz-fit-content;
+                width: fit-content;
+                border-radius:8px;
+                margin-bottom:5px;
+            }
+
+            .user
+            {
+                margin-left: auto;
+                background-color:DodgerBlue;
+                color:white;
+            }
+
+            input
+            {
+                flex:2;
+                height:50px;
+                border:none;
+                outline: none;
+                padding-left: 8px;
+                font-size:16px;
+            }
+
+            .fg
+            {
+                display:flex;
+            }
+
+            button
+            {
+                width:100px;
+                font-size: large;
+                transition-duration: 0.5s;
+                border:none;
+                outline: none;
+                background-color:DodgerBlue;
+                color: white;
+                cursor:pointer;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="box">
+            <div class="body" id="body">
+
+            </div>
+
+            <div class="fg">
+                <input type="text" id="ipt">
+
+                <button id="btn">
+                    SEND
+                </button>
+            </div>
+        </div>
+
+        <script>
+            let load = false, msgs = [], count = 0, user, temp = "";
+
+            function main()
+            {
+                user = "";
+
+                const connect = () => new Promise((res, rej) =>
+                {
+                    const protocol = (location.protocol == "http:") ? "ws:" : "wss:";
+                    const port = (location.port == "") ? "" : (":" + location.port);
+                    const socket = new WebSocket(protocol + "//" + location.hostname + port + "/wss");
+
+                    socket.addEventListener("open", () => res(socket));
+                    socket.addEventListener("error", () => res(connect()));
+                });
+
+                connect().then((socket) =>
+                {
+                    socket.onmessage = (event) =>
+                    {
+                        const data = JSON.parse(event.data);
+
+                        for (const key in data)
+                        {
+                            if (key == "command")
+                            {
+                                if (data[key] == "get out")
+                                {
+                                    location.replace("/public/");
+                                }
+                                else if (data[key] == "get in")
+                                {
+                                    if (!load)
+                                    {
+                                        socket.send(JSON.stringify({ "history": 100 }));
+                                    }
+                                    else
+                                    {
+                                        socket.send(JSON.stringify({ "history": 0 }));
+                                    }
+                                }
+                            }
+                            else if (key == "message")
+                            {
+                                const ele = document.getElementById("body");
+
+                                if (data[key]["user"] == user)
+                                {
+                                    ele.innerHTML += "<p class='message user'>" + data[key]["text"] + "</p>";
+                                    temp = "";
+                                }
+                                else
+                                {
+                                    if (data[key]["user"] != temp)
+                                    {
+                                        if (temp == "")
+                                        {
+                                            ele.innerHTML += "<p>";
+                                        }
+                                        else
+                                        {
+                                            ele.innerHTML += "<p style='margin-top: 20px;'>";
+                                        }
+
+                                        ele.innerHTML += data[key]["user"] + "</p>";
+                                        temp = data[key]["user"];
+                                    }
+
+                                    ele.innerHTML += "<p class='message'>" + data[key]["text"] + "</p>";
+                                }
+
+                                ele.scrollTop = ele.scrollHeight;
+
+                                if (load)
+                                {
+                                    count++;
+                                }
+                            }
+                            else if (key == "check")
+                            {
+                                if (user == "")
+                                {
+                                    user = data[key];
+                                }
+                                else if (!load)
+                                {
+                                    count = data[key];
+                                    load = true;
+                                }
+                                else if (data[key] > count)
+                                {
+                                    socket.send(JSON.stringify({ "history": data[key] - count }));
+                                }
+                                else
+                                {
+                                    while (msgs.length > 0)
+                                    {
+                                        socket.send(JSON.stringify({ "message": msgs.shift() }));
+                                    }
+                                }
+                            }
+                        }
+                    };
+
+                    function send(event, id)
+                    {
+                        const ele = document.getElementById("ipt");
+
+                        if (((event.key == "Enter" && id == "ipt") || id == "btn" ) && ele.value != "")
+                        {
+                            if (socket.readyState == 1)
+                            {
+                                socket.send(JSON.stringify({ "message": ele.value }));
+                            }
+                            else
+                            {
+                                msgs.push(ele.value);
+                            }
+
+                            ele.value = "";
+                        }
+                    }
+
+                    document.getElementById("ipt").onkeydown = (event) =>
+                    {
+                        send(event, "ipt");
+                    };
+
+                    document.getElementById("btn").onclick = (event) =>
+                    {
+                        send(event, "btn");
+                    };
+
+                    const loop = setInterval(() =>
+                    {
+                        if (socket.readyState != 1)
+                        {
+                            main();
+                            clearInterval(loop);
+                        }
+                    }, 1000);
+                });
+            }
+
+            main();
+        </script>
+    </body>
+</html>
