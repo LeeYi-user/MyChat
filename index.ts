@@ -51,7 +51,7 @@ async function sign_up(ctx: Context)
     const data = await body.value.read();
     const accounts = await db.collection<User>("users").countDocuments({ "username": data["fields"]["username"] });
 
-    if (accounts > 0 || data["fields"]["username"] == "")
+    if (accounts > 0)
     {
         ctx.response.body = "sign up fail";
     }

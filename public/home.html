@@ -95,7 +95,7 @@
             </div>
 
             <div class="fg">
-                <input type="text" id="ipt">
+                <input type="text" id="ipt" maxlength="256">
 
                 <button id="btn">
                     SEND
@@ -104,12 +104,10 @@
         </div>
 
         <script>
-            let load = false, msgs = [], count = 0, user, temp = "";
+            let load = false, msgs = [], count = 0, temp = null;
 
             function main()
             {
-                user = "";
-
                 const connect = () => new Promise((res, rej) =>
                 {
                     const protocol = (location.protocol == "http:") ? "ws:" : "wss:";
@@ -122,6 +120,8 @@
 
                 connect().then((socket) =>
                 {
+                    let user = null;
+
                     socket.onmessage = (event) =>
                     {
                         const data = JSON.parse(event.data);
@@ -132,6 +132,7 @@
                             {
                                 if (data[key] == "get out")
                                 {
+                                    alert("You need to log in first!");
                                     location.replace("/public/");
                                 }
                                 else if (data[key] == "get in")
@@ -152,23 +153,30 @@
 
                                 if (data[key]["user"] == user)
                                 {
-                                    ele.innerHTML += "<p class='message user'>" + data[key]["text"] + "</p>";
-                                    temp = "";
+                                    if (temp == null)
+                                    {
+                                        ele.innerHTML += "<p class='message user'>" + data[key]["text"] + "</p>";
+                                    }
+                                    else
+                                    {
+                                        ele.innerHTML += "<p class='message user' style='margin-top: 20px;'>" + data[key]["text"] + "</p>";
+                                    }
+
+                                    temp = null;
                                 }
                                 else
                                 {
                                     if (data[key]["user"] != temp)
                                     {
-                                        if (temp == "")
+                                        if (temp == null)
                                         {
-                                            ele.innerHTML += "<p>";
+                                            ele.innerHTML += "<p>" + data[key]["user"] + "</p>";
                                         }
                                         else
                                         {
-                                            ele.innerHTML += "<p style='margin-top: 20px;'>";
+                                            ele.innerHTML += "<p style='margin-top: 20px;'>" + data[key]["user"] + "</p>";
                                         }
 
-                                        ele.innerHTML += data[key]["user"] + "</p>";
                                         temp = data[key]["user"];
                                     }
 
@@ -184,7 +192,7 @@
                             }
                             else if (key == "check")
                             {
-                                if (user == "")
+                                if (user == null)
                                 {
                                     user = data[key];
                                 }

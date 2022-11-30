@@ -12,8 +12,10 @@
                 font-family: sans-serif;
             }
 
-            body
+            html, body
             {
+                height: 100%;
+                overflow: hidden;
                 background-color:DodgerBlue;
             }
 
@@ -112,11 +114,11 @@
                 <br></br>
 
                 <form id="form">
-                    <input class="login-box-input" type="text" name="username" id="username" placeholder="Username">
+                    <input class="login-box-input" type="text" name="username" placeholder="Username" maxlength="16">
 
                     <br></br>
 
-                    <input class="login-box-input" type="password" name="password" id="password" placeholder="Password">
+                    <input class="login-box-input" type="password" name="password" placeholder="Password" maxlength="32">
 
                     <br></br>
 
@@ -124,7 +126,7 @@
 
                     <br></br>
 
-                    <input class="styled" type="button" value="Sign In" onclick="sign_in()">
+                    <input class="styled" type="button" value="Log In" onclick="sign_in()">
 
                     <br></br>
 
@@ -138,6 +140,16 @@
 
             async function sign_up()
             {
+                if (document.getElementsByName("username")[0].value == "")
+                {
+                    setTimeout(() =>
+                    {
+                        alert("Invalid username!");
+                    }, 400);
+
+                    return;
+                }
+
                 const request = await fetch(location.protocol + "//" + location.hostname + port + "/sign_up",
                 {
                     method: "POST",
