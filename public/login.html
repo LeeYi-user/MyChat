@@ -68,11 +68,6 @@
                 box-shadow: 0 0 0 6px DodgerBlue;
             }
 
-            .login-box-input:focus::placeholder
-            {
-                color: transparent;
-            }
-
             .styled
             {
                 width: 100%;
@@ -100,6 +95,8 @@
                 box-shadow: 6px 4px 44px 2px rgba(0, 0, 0, 0.24);
             }
         </style>
+
+        <script type="module" src="login.js"></script>
     </head>
 
     <body>
@@ -126,69 +123,13 @@
 
                     <br></br>
 
-                    <input class="styled" type="button" value="Log In" onclick="sign_in()">
+                    <input class="styled" type="button" id="sign_in" value="Sign In">
 
                     <br></br>
 
-                    <input class="styled" type="button" value="Sign Up" onclick="sign_up()">
+                    <input class="styled" type="button" id="sign_up" value="Sign Up">
                 </form>
             </div>
         </div>
-
-        <script>
-            const port = (location.port == "") ? "" : (":" + location.port);
-
-            async function sign_up()
-            {
-                if (document.getElementsByName("username")[0].value == "")
-                {
-                    setTimeout(() =>
-                    {
-                        alert("Invalid username!");
-                    }, 400);
-
-                    return;
-                }
-
-                const request = await fetch(location.protocol + "//" + location.hostname + port + "/sign_up",
-                {
-                    method: "POST",
-                    body: new FormData(document.getElementById("form"))
-                });
-
-                request.text().then((responseText) =>
-                {
-                    if (responseText == "sign up fail")
-                    {
-                        alert("This username already exists!");
-                    }
-                    else if (responseText == "sign up success")
-                    {
-                        alert("Sign up successfully!");
-                    }
-                });
-            }
-
-            async function sign_in()
-            {
-                const request = await fetch(location.protocol + "//" + location.hostname + port + "/sign_in",
-                {
-                    method: "POST",
-                    body: new FormData(document.getElementById("form"))
-                });
-
-                request.text().then((responseText) =>
-                {
-                    if (responseText == "sign in fail")
-                    {
-                        alert("Wrong username or password!");
-                    }
-                    else if (responseText == "sign in success")
-                    {
-                        location.replace("/public/home.html");
-                    }
-                });
-            }
-        </script>
     </body>
 </html>

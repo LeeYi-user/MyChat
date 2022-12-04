@@ -68,7 +68,7 @@ async function sign_in(ctx: Context)
     const data = await body.value.read();
     const accounts = await db.collection<User>("users").countDocuments({ "username": data["fields"]["username"] });
 
-    if (accounts == 0)
+    if (accounts === 0)
     {
         ctx.response.body = "sign in fail";
     }
@@ -76,7 +76,7 @@ async function sign_in(ctx: Context)
     {
         const password = (await db.collection<User>("users").findOne({ "username": data["fields"]["username"] }))?.password;
 
-        if (password != data["fields"]["password"])
+        if (password !== data["fields"]["password"])
         {
             ctx.response.body = "sign in fail";
         }
@@ -104,46 +104,52 @@ async function wss(ctx: Context)
     {
         clients.set(socket, user);
 
-        if (user == null)
-        {
-            socket.send(JSON.stringify({ "command": "get out" }));
-        }
-        else
+        if (user !== undefined)
         {
             socket.send(JSON.stringify({ "check": user }));
             socket.send(JSON.stringify({ "command": "get in" }));
         }
+        else
+        {
+            socket.send(JSON.stringify({ "command": "get out" }));
+        }
     };
 
-    socket.onmessage = async (event) =>
+    socket.onmessage = async event =>
     {
         const data = JSON.parse(event.data);
 
         for (const key in data)
         {
-            if (key == "history")
+            switch (key)
             {
-                if (data[key] > 0)
+                case "history":
                 {
-                    const msgs = await db.collection<Msg>("msgs").find().sort({ "_id": -1 }).limit(data[key]).toArray();
-
-                    for (const data of msgs.reverse())
+                    if (data[key] > 0)
                     {
-                        socket.send(JSON.stringify({ "message": { "user": data.user, "text": data.text } }));
+                        const msgs = await db.collection<Msg>("msgs").find().sort({ "_id": -1 }).limit(data[key]).toArray();
+
+                        for (const data of msgs.reverse())
+                        {
+                            socket.send(JSON.stringify({ "message": { "user": data.user, "text": data.text } }));
+                        }
                     }
+
+                    socket.send(JSON.stringify({ "check": await db.collection<Msg>("msgs").countDocuments() }));
+                    break;
                 }
-
-                socket.send(JSON.stringify({ "check": await db.collection<Msg>("msgs").countDocuments() }));
-            }
-            else if (key == "message")
-            {
-                const msg = { "user": user, "text": data[key] };
-
-                await db.collection<Msg>("msgs").insertOne(msg);
-
-                for (const [socket, _user] of clients)
+                case "message":
                 {
-                    socket.send(JSON.stringify({ "message": msg }));
+                    const msg = { "user": user, "text": data[key] };
+
+                    await db.collection<Msg>("msgs").insertOne(msg);
+
+                    for (const [socket, _user] of clients)
+                    {
+                        socket.send(JSON.stringify({ "message": msg }));
+                    }
+
+                    break;
                 }
             }
         }

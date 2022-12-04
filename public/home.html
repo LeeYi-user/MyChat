@@ -86,6 +86,8 @@
                 cursor:pointer;
             }
         </style>
+
+        <script type="module" src="home.js"></script>
     </head>
 
     <body>
@@ -95,168 +97,12 @@
             </div>
 
             <div class="fg">
-                <input type="text" id="ipt" maxlength="256">
+                <input type="text" id="input" maxlength="256">
 
-                <button id="btn">
+                <button id="button">
                     SEND
                 </button>
             </div>
         </div>
-
-        <script>
-            let load = false, msgs = [], count = 0, temp = null;
-
-            function main()
-            {
-                const connect = () => new Promise((res, rej) =>
-                {
-                    const protocol = (location.protocol == "http:") ? "ws:" : "wss:";
-                    const port = (location.port == "") ? "" : (":" + location.port);
-                    const socket = new WebSocket(protocol + "//" + location.hostname + port + "/wss");
-
-                    socket.addEventListener("open", () => res(socket));
-                    socket.addEventListener("error", () => res(connect()));
-                });
-
-                connect().then((socket) =>
-                {
-                    let user = null;
-
-                    socket.onmessage = (event) =>
-                    {
-                        const data = JSON.parse(event.data);
-
-                        for (const key in data)
-                        {
-                            if (key == "command")
-                            {
-                                if (data[key] == "get out")
-                                {
-                                    alert("You need to log in first!");
-                                    location.replace("/public/");
-                                }
-                                else if (data[key] == "get in")
-                                {
-                                    if (!load)
-                                    {
-                                        socket.send(JSON.stringify({ "history": 100 }));
-                                    }
-                                    else
-                                    {
-                                        socket.send(JSON.stringify({ "history": 0 }));
-                                    }
-                                }
-                            }
-                            else if (key == "message")
-                            {
-                                const ele = document.getElementById("body");
-
-                                if (data[key]["user"] == user)
-                                {
-                                    if (temp == null)
-                                    {
-                                        ele.innerHTML += "<p class='message user'>" + data[key]["text"] + "</p>";
-                                    }
-                                    else
-                                    {
-                                        ele.innerHTML += "<p class='message user' style='margin-top: 20px;'>" + data[key]["text"] + "</p>";
-                                    }
-
-                                    temp = null;
-                                }
-                                else
-                                {
-                                    if (data[key]["user"] != temp)
-                                    {
-                                        if (temp == null)
-                                        {
-                                            ele.innerHTML += "<p>" + data[key]["user"] + "</p>";
-                                        }
-                                        else
-                                        {
-                                            ele.innerHTML += "<p style='margin-top: 20px;'>" + data[key]["user"] + "</p>";
-                                        }
-
-                                        temp = data[key]["user"];
-                                    }
-
-                                    ele.innerHTML += "<p class='message'>" + data[key]["text"] + "</p>";
-                                }
-
-                                ele.scrollTop = ele.scrollHeight;
-
-                                if (load)
-                                {
-                                    count++;
-                                }
-                            }
-                            else if (key == "check")
-                            {
-                                if (user == null)
-                                {
-                                    user = data[key];
-                                }
-                                else if (!load)
-                                {
-                                    count = data[key];
-                                    load = true;
-                                }
-                                else if (data[key] > count)
-                                {
-                                    socket.send(JSON.stringify({ "history": data[key] - count }));
-                                }
-                                else
-                                {
-                                    while (msgs.length > 0)
-                                    {
-                                        socket.send(JSON.stringify({ "message": msgs.shift() }));
-                                    }
-                                }
-                            }
-                        }
-                    };
-
-                    function send(event, id)
-                    {
-                        const ele = document.getElementById("ipt");
-
-                        if (((event.key == "Enter" && id == "ipt") || id == "btn" ) && ele.value != "")
-                        {
-                            if (socket.readyState == 1)
-                            {
-                                socket.send(JSON.stringify({ "message": ele.value }));
-                            }
-                            else
-                            {
-                                msgs.push(ele.value);
-                            }
-
-                            ele.value = "";
-                        }
-                    }
-
-                    document.getElementById("ipt").onkeydown = (event) =>
-                    {
-                        send(event, "ipt");
-                    };
-
-                    document.getElementById("btn").onclick = (event) =>
-                    {
-                        send(event, "btn");
-                    };
-
-                    const loop = setInterval(() =>
-                    {
-                        if (socket.readyState != 1)
-                        {
-                            main();
-                            clearInterval(loop);
-                        }
-                    }, 1000);
-                });
-            }
-
-            main();
-        </script>
     </body>
 </html>
