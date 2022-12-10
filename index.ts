@@ -26,6 +26,7 @@ await client.connect(Deno.env.get("URI")!);
 const db = client.database("chat");
 
 const router = new Router();
+router.get("/favicon.ico", favicon);
 router.get("/public/script/(.*)", script);
 router.get("/login", login);
 router.post("/sign_up", sign_up);
@@ -41,6 +42,11 @@ const app = new Application();
 app.use(Session.initMiddleware(new MongoStore(db, "session"), { cookieSetOptions: { expires: new Date(3000, 1, 1) } }));
 app.use(router.routes());
 app.use(router.allowedMethods());
+
+async function favicon(ctx: Context)
+{
+    ctx.response.body = await Deno.readFile("./favicon.png");
+}
 
 async function script(ctx: Context)
 {
