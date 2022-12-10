@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <style>
+            *
+            {
+                padding:0;
+                margin:0;
+                font-family: sans-serif;
+            }
+
+            html, body
+            {
+                height: 100%;
+                overflow: hidden;
+                background-color:DodgerBlue;
+            }
+
+            .box
+            {
+                width:100%;
+                height:100vh;
+                display:flex;
+                background-color:rgba(0,0,0,0.5);
+            }
+
+            .search-box
+            {
+                width:400px;
+                top:40%;
+                left:50%;
+                transform: translate(-50%,-50%);
+                -webkit-transform: translate(-50%,-50%);
+                position:absolute;
+                color:#fff;
+            }
+
+            .search-box h1
+            {
+                font-size:50px;
+                text-align:center;
+                margin:40px 0;
+            }
+
+            .search-box-input
+            {
+                font-size:16px;
+                width:100%;
+                padding: 15px 10px;
+                box-sizing: border-box;
+                border:0;
+                outline:none;
+                border-radius: 7px;
+            }
+
+            .search-box-input:focus
+            {
+                box-shadow: 0 0 0 3px DodgerBlue;
+            }
+
+            /*the container must be positioned relative:*/
+            .custom-select {
+                position: relative;
+                font-size:16px;
+                border-radius: 7px;
+                margin-bottom: 18px;
+            }
+
+            .custom-select select {
+                display: none; /*hide original SELECT element:*/
+            }
+
+            .select-selected {
+                border-radius: 7px;
+                background-color: white;
+            }
+
+            /*style the arrow inside the select element:*/
+            .select-selected:after {
+                position: absolute;
+                content: "";
+                top: 18px;
+                right: 10px;
+                width: 0;
+                height: 0;
+                border: 6px solid transparent;
+                border-color: dodgerblue transparent transparent transparent;
+            }
+
+            /*point the arrow upwards when the select box is open (active):*/
+            .select-selected.select-arrow-active:after {
+                border-color: transparent transparent dodgerblue transparent;
+                top: 9px;
+            }
+
+            /*style the items (options), including the selected item:*/
+            .select-items div,.select-selected {
+                color: gray;
+                padding: 14px 10px;
+                border: 1px solid transparent;
+                border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+                cursor: pointer;
+                user-select: none;
+            }
+
+            /*style items (options):*/
+            .select-items {
+                position: absolute;
+                background-color: white;
+                top: 100%;
+                left: 0;
+                right: 0;
+                z-index: 99;
+                border-radius: 7px;
+                height: auto;
+                max-height: 240px;
+                overflow-y: auto;
+                word-wrap: break-word;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            .select-items::-webkit-scrollbar
+            {
+                display: none;
+            }
+
+            /*hide the items when the select box is closed:*/
+            .select-hide {
+                display: none;
+            }
+
+            .select-items div:hover, .same-as-selected {
+                background-color: rgba(0, 0, 0, 0.1);
+            }
+
+            .styled
+            {
+                width: 100%;
+                text-decoration: none;
+                border: none;
+                padding: 20px 40px;
+                font-size: 1rem;
+                background-color: DodgerBlue;
+                color: #fff;
+                border-radius: 10px;
+                box-shadow: 7px 6px 28px 1px rgba(0, 0, 0, 0.24);
+                cursor: pointer;
+                outline: none;
+                transition: 0.2s all;
+            }
+
+            .styled:hover
+            {
+                background-color: rgba(30, 144, 255, 0.5);
+            }
+
+            .styled:active
+            {
+                transform: scale(0.98);
+                box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+            }
+
+            @media only screen and (max-width: 620px)
+            {
+                .search-box
+                {
+                    width: 90%;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="box">
+            <div class="search-box">
+                <br></br>
+
+                <br>
+                    <h1>Search</h1>
+                </br>
+
+                <form id="form">
+                    <input class="search-box-input" type="text" name="roomname" placeholder="Room Name" maxlength="16" autocomplete="off">
+
+                    <br></br>
+
+                    <div class="custom-select">
+                        <select id="custom-select">
+                            <option value="0">Room List</option>
+                        </select>
+                    </div>
+
+                    <br></br>
+
+                    <input class="styled" type="button" id="join" value="Create / Join">
+
+                    <br></br>
+
+                    <input class="styled" type="button" id="sign_out" value="Sign Out">
+                </form>
+            </div>
+        </div>
+
+        <script src="/public/script/index.js"></script>
+    </body>
+</html>

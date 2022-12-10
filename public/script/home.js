@@ -1,13 +1,13 @@
 let load = false, count = 0, temp = null;
 const msgs = [];
 
-async function main()
+(async function main()
 {
     let user = null;
 
     function connect()
     {
-        return new Promise(resolve =>
+        return new Promise((resolve) =>
         {
             const prot = (location.protocol === "http:") ? "ws:" : "wss:";
             const port = (location.port === "") ? "" : (":" + location.port);
@@ -20,7 +20,7 @@ async function main()
 
     const socket = await connect();
 
-    socket.onmessage = event =>
+    socket.onmessage = (event) =>
     {
         const data = JSON.parse(event.data);
 
@@ -33,6 +33,15 @@ async function main()
                     if (user === null)
                     {
                         user = data[key];
+
+                        if (!load)
+                        {
+                            socket.send(JSON.stringify({ "history": 100 }));
+                        }
+                        else
+                        {
+                            socket.send(JSON.stringify({ "history": 0 }));
+                        }
                     }
                     else if (!load)
                     {
@@ -48,33 +57,6 @@ async function main()
                         while (msgs.length > 0)
                         {
                             socket.send(JSON.stringify({ "message": msgs.shift() }));
-                        }
-                    }
-
-                    break;
-                }
-                case "command":
-                {
-                    switch (data[key])
-                    {
-                        case "get in":
-                        {
-                            if (!load)
-                            {
-                                socket.send(JSON.stringify({ "history": 100 }));
-                            }
-                            else
-                            {
-                                socket.send(JSON.stringify({ "history": 0 }));
-                            }
-
-                            break;
-                        }
-                        case "get out":
-                        {
-                            alert("You need to sign in first!");
-                            location.replace("/public/");
-                            break;
                         }
                     }
 
@@ -133,7 +115,7 @@ async function main()
     {
         const ele = document.getElementById("input");
 
-        if (((event.key === "Enter" && id === "input") || id === "button" ) && ele.value !== "")
+        if (((event.key === "Enter" && id === "input") || id === "button" ) && ele.value.trim().length > 0)
         {
             if (socket.readyState === WebSocket.OPEN)
             {
@@ -148,8 +130,8 @@ async function main()
         }
     }
 
-    document.getElementById("input").onkeydown = event => send(event, "input");
-    document.getElementById("button").onclick = event => send(event, "button");
+    document.getElementById("input").onkeydown = (event) => send(event, "input");
+    document.getElementById("button").onclick = (event) => send(event, "button");
 
     const loop = setInterval(async () =>
     {
@@ -159,6 +141,4 @@ async function main()
             await main();
         }
     }, 1000);
-}
-
-await main();
+})();

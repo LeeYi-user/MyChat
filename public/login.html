@@ -97,8 +97,6 @@
                 }
             }
         </style>
-
-        <script type="module" src="login.js"></script>
     </head>
 
     <body>
@@ -107,11 +105,11 @@
                 <br></br>
 
                 <br>
-                    <h1> Welcome </h1>
+                    <h1>Welcome</h1>
                 </br>
 
                 <form id="form">
-                    <input class="login-box-input" type="text" name="username" placeholder="Username" maxlength="16">
+                    <input class="login-box-input" type="text" name="username" placeholder="Username" maxlength="16" autocomplete="off">
 
                     <br></br>
 
@@ -121,7 +119,7 @@
 
                     <br></br>
 
-                    <input class="styled" type="button" id="sign_in" value="Sign In">
+                    <input class="styled" type="button" id="sign_in" value="Log In">
 
                     <br></br>
 
@@ -129,5 +127,7 @@
                 </form>
             </div>
         </div>
+
+        <script src="/public/script/login.js"></script>
     </body>
 </html>
