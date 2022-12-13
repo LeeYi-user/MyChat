@@ -2,8 +2,26 @@
 
 (async () =>
 {
-    const request = await fetch("/search");
-    const rooms = await request.text();
+    function request()
+    {
+        return new Promise((resolve) =>
+        {
+            fetch("/search").then((response) =>
+            {
+                if (response.ok)
+                {
+                    resolve(response);
+                }
+                else
+                {
+                    resolve(request());
+                }
+            });
+        });
+    }
+
+    const response = await request();
+    const rooms = await response.text();
 
     if (rooms !== "[]")
     {
@@ -26,7 +44,7 @@
             return;
         }
 
-        const _request = await fetch("/join",
+        const _response = await fetch("/join",
         {
             method: "POST",
             body: new FormData(document.getElementById("form"))
@@ -37,7 +55,7 @@
 
     document.getElementById("sign_out").onclick = async () =>
     {
-        const _request = await fetch("/sign_out");
+        const _response = await fetch("/sign_out");
         location.replace("/login");
     };
 

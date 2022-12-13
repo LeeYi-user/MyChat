@@ -8,13 +8,13 @@ document.getElementById("sign_up").onclick = async () =>
         return;
     }
 
-    const request = await fetch("/sign_up",
+    const response = await fetch("/sign_up",
     {
         method: "POST",
         body: new FormData(document.getElementById("form"))
     });
 
-    if (await request.text() === "true")
+    if (await response.text() === "true")
     {
         alert("Sign up successfully!");
     }
@@ -26,13 +26,13 @@ document.getElementById("sign_up").onclick = async () =>
 
 document.getElementById("sign_in").onclick = async () =>
 {
-    const request = await fetch("/sign_in",
+    const response = await fetch("/sign_in",
     {
         method: "POST",
         body: new FormData(document.getElementById("form"))
     });
 
-    if (await request.text() === "true")
+    if (await response.text() === "true")
     {
         location.replace("/");
     }
