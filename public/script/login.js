@@ -34,7 +34,7 @@ document.getElementById("sign_in").onclick = async () =>
 
     if (await response.text() === "true")
     {
-        location.replace("/");
+        location.href = "/";
     }
     else
     {

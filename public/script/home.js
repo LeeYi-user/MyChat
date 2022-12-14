@@ -115,7 +115,7 @@ const msgs = [];
     {
         const ele = document.getElementById("input");
 
-        if (((event.key === "Enter" && id === "input") || id === "button" ) && ele.value.trim().length > 0)
+        if (((event.key === "Enter" && id === "input") || id === "button" ) && ele.value.trim().length > 0 && user !== null)
         {
             if (socket.readyState === WebSocket.OPEN)
             {

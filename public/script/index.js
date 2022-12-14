@@ -50,7 +50,7 @@
             body: new FormData(document.getElementById("form"))
         });
 
-        location.replace("/home");
+        location.href = "/home";
     };
 
     document.getElementById("sign_out").onclick = async () =>
