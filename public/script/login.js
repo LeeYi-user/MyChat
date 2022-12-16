@@ -14,7 +14,7 @@ document.getElementById("sign_up").onclick = async () =>
         body: new FormData(document.getElementById("form"))
     });
 
-    if (await response.text() === "true")
+    if (await response.json())
     {
         alert("Sign up successfully!");
     }
@@ -32,7 +32,7 @@ document.getElementById("sign_in").onclick = async () =>
         body: new FormData(document.getElementById("form"))
     });
 
-    if (await response.text() === "true")
+    if (await response.json())
     {
         location.href = "/";
     }

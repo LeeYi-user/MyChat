@@ -21,13 +21,13 @@
     }
 
     const response = await request();
-    const rooms = await response.text();
+    const rooms = await response.json();
 
-    if (rooms !== "[]")
+    if (rooms.length > 0)
     {
         let count = 0;
 
-        for (const room of JSON.parse(rooms).reverse())
+        for (const room of rooms.reverse())
         {
             count++;
             document.getElementById("custom-select").innerHTML += "<option value='" + count + "'>" + room["name"] + "</option>";

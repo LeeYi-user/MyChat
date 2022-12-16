@@ -70,11 +70,11 @@ async function sign_up(ctx: Context)
     if (accounts === 0)
     {
         await db.collection<User>("users").insertOne({ "username": data["fields"]["username"], "password": data["fields"]["password"] });
-        ctx.response.body = "true";
+        ctx.response.body = true;
     }
     else
     {
-        ctx.response.body = "false";
+        ctx.response.body = false;
     }
 }
 
@@ -91,16 +91,16 @@ async function sign_in(ctx: Context)
         if (password === data["fields"]["password"])
         {
             await ctx.state.session.set("user", data["fields"]["username"]);
-            ctx.response.body = "true";
+            ctx.response.body = true;
         }
         else
         {
-            ctx.response.body = "false";
+            ctx.response.body = false;
         }
     }
     else
     {
-        ctx.response.body = "false";
+        ctx.response.body = false;
     }
 }
 
@@ -125,40 +125,30 @@ async function join(ctx: Context)
 {
     const body = ctx.request.body({ type: "form-data" });
     const data = await body.value.read();
+    let name = data["fields"]["roomname"];
 
-    if (data["fields"]["roomname"].startsWith("@"))
+    if (name.startsWith("@"))
     {
         const user = await ctx.state.session.get("user");
-        const users = data["fields"]["roomname"].slice(1).replace(/\s/g, "").split("@").filter((elem, index, self) => index === self.indexOf(elem) && elem.length > 0);
+        const users = name.slice(1).replace(/\s/g, "").split("@").filter((elem, index, self) => index === self.indexOf(elem) && elem.length > 0);
 
         if (!users.includes(user))
         {
             users.push(user);
         }
 
-        const name = "@" + users.sort().join("@");
-        const rooms = await db.collection<Room>("rooms").countDocuments({ "name": name });
-
-        if (rooms === 0)
-        {
-            await db.collection<Room>("rooms").insertOne({ "name": name });
-        }
-
-        await ctx.state.session.set("room", name);
-        ctx.response.body = null;
+        name = "@" + users.sort().join("@");
     }
-    else
+
+    const rooms = await db.collection<Room>("rooms").countDocuments({ "name": name });
+
+    if (rooms === 0)
     {
-        const rooms = await db.collection<Room>("rooms").countDocuments({ "name": data["fields"]["roomname"] });
-
-        if (rooms === 0)
-        {
-            await db.collection<Room>("rooms").insertOne({ "name": data["fields"]["roomname"] });
-        }
-
-        await ctx.state.session.set("room", data["fields"]["roomname"]);
-        ctx.response.body = null;
+        await db.collection<Room>("rooms").insertOne({ "name": name });
     }
+
+    await ctx.state.session.set("room", name);
+    ctx.response.body = null;
 }
 
 async function home(ctx: Context)
