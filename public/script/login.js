@@ -2,9 +2,9 @@ document.getElementById("sign_up").onclick = async () =>
 {
     const ele = document.getElementsByName("username")[0];
 
-    if (ele.value.length === 0 || ele.value.indexOf(" ") > -1)
+    if (ele.value.length === 0 || ele.value.indexOf(" ") > -1 || ele.value.indexOf("@") > -1)
     {
-        setTimeout(() => alert("Invalid username!"), 400);
+        setTimeout(() => alert("Invalid username!"), 200);
         return;
     }
 

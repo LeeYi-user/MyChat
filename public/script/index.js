@@ -38,9 +38,9 @@
     {
         const ele = document.getElementsByName("roomname")[0];
 
-        if (ele.value.length === 0 || ele.value.indexOf(" ") > -1)
+        if (ele.value.length === 0 || ((ele.value.indexOf(" ") > -1 || ele.value.indexOf("@") > -1) && !ele.value.startsWith("@")))
         {
-            setTimeout(() => alert("Invalid room name!"), 400);
+            setTimeout(() => alert("Invalid room name!"), 200);
             return;
         }
 
