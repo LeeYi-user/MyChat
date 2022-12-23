@@ -30,7 +30,7 @@
         for (const room of rooms.reverse())
         {
             count++;
-            document.getElementById("custom-select").innerHTML += "<option value='" + count + "'>" + room["name"] + "</option>";
+            document.getElementById("custom-select").innerHTML += "<option value='" + count + "'>" + room["name"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</option>";
         }
     }
 
@@ -89,7 +89,7 @@
             for (i = 0; i < sl; i++) {
               if (s.options[i].innerHTML == this.innerHTML) {
                 s.selectedIndex = i;
-                document.getElementsByName("roomname")[0].value = this.innerHTML;
+                document.getElementsByName("roomname")[0].value = this.innerHTML.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
                 y = this.parentNode.getElementsByClassName("same-as-selected");
                 yl = y.length;
                 for (k = 0; k < yl; k++) {

@@ -118,7 +118,7 @@ async function index(ctx: Context)
 
 async function search(ctx: Context)
 {
-    ctx.response.body = await db.collection<Room>("rooms").find({ name: /^[^@].*/ }).sort({ "_id": -1 }).limit(100).toArray();
+    ctx.response.body = await db.collection<Room>("rooms").find({ name: /^[^@]/ }).sort({ "_id": -1 }).limit(100).toArray();
 }
 
 async function join(ctx: Context)

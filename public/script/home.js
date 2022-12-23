@@ -70,11 +70,11 @@ const msgs = [];
                     {
                         if (temp === null)
                         {
-                            ele.innerHTML += "<p class='message user'>" + data[key]["text"] + "</p>";
+                            ele.innerHTML += "<p class='message user'>" + data[key]["text"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
                         }
                         else
                         {
-                            ele.innerHTML += "<p class='message user' style='margin-top: 20px;'>" + data[key]["text"] + "</p>";
+                            ele.innerHTML += "<p class='message user' style='margin-top: 20px;'>" + data[key]["text"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
                         }
 
                         temp = null;
@@ -85,17 +85,17 @@ const msgs = [];
                         {
                             if (temp === null)
                             {
-                                ele.innerHTML += "<p>" + data[key]["user"] + "</p>";
+                                ele.innerHTML += "<p>" + data[key]["user"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
                             }
                             else
                             {
-                                ele.innerHTML += "<p style='margin-top: 20px;'>" + data[key]["user"] + "</p>";
+                                ele.innerHTML += "<p style='margin-top: 20px;'>" + data[key]["user"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
                             }
 
                             temp = data[key]["user"];
                         }
 
-                        ele.innerHTML += "<p class='message'>" + data[key]["text"] + "</p>";
+                        ele.innerHTML += "<p class='message'>" + data[key]["text"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
                     }
 
                     ele.scrollTop = ele.scrollHeight;
