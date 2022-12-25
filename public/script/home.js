@@ -68,30 +68,14 @@ const msgs = [];
 
                     if (data[key]["user"] === user)
                     {
-                        if (temp === null)
-                        {
-                            ele.innerHTML += "<p class='message user'>" + data[key]["text"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
-                        }
-                        else
-                        {
-                            ele.innerHTML += "<p class='message user' style='margin-top: 20px;'>" + data[key]["text"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
-                        }
-
+                        ele.innerHTML += "<p class='message user'>" + data[key]["text"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
                         temp = null;
                     }
                     else
                     {
                         if (data[key]["user"] !== temp)
                         {
-                            if (temp === null)
-                            {
-                                ele.innerHTML += "<p>" + data[key]["user"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
-                            }
-                            else
-                            {
-                                ele.innerHTML += "<p style='margin-top: 20px;'>" + data[key]["user"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
-                            }
-
+                            ele.innerHTML += "<p>" + data[key]["user"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
                             temp = data[key]["user"];
                         }
 
