@@ -68,7 +68,15 @@ const msgs = [];
 
                     if (data[key]["user"] === user)
                     {
-                        ele.innerHTML += "<p class='message user'>" + data[key]["text"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
+                        if (temp === null)
+                        {
+                            ele.innerHTML += "<p class='message user'>" + data[key]["text"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
+                        }
+                        else
+                        {
+                            ele.innerHTML += "<p class='message user' style='margin-top: 20px;'>" + data[key]["text"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
+                        }
+
                         temp = null;
                     }
                     else
