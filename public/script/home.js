@@ -75,7 +75,15 @@ const msgs = [];
                     {
                         if (data[key]["user"] !== temp)
                         {
-                            ele.innerHTML += "<p>" + data[key]["user"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
+                            if (temp === null)
+                            {
+                                ele.innerHTML += "<p>" + data[key]["user"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
+                            }
+                            else
+                            {
+                                ele.innerHTML += "<p style='margin-top: 20px;'>" + data[key]["user"].replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p>";
+                            }
+
                             temp = data[key]["user"];
                         }
 
