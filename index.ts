@@ -1,6 +1,10 @@
 import { Application, Context, Router, send } from "https://deno.land/x/oak@v11.1.0/mod.ts";
-import { MongoClient } from "https://deno.land/x/mongo@v0.29.4/mod.ts";
-import { Session, MongoStore } from "https://deno.land/x/oak_sessions@v4.0.5/mod.ts";
+import { MongoClient, ServerApiVersion } from "npm:mongodb@6.21.0";
+import type { Collection, Db } from "npm:mongodb@6.21.0";
+// Imported straight from src/ instead of mod.ts: mod.ts eagerly pulls in every
+// bundled store, including the one built on deno.land/x/mongo.
+import Session, { type SessionData } from "https://deno.land/x/oak_sessions@v4.0.5/src/Session.ts";
+import type Store from "https://deno.land/x/oak_sessions@v4.0.5/src/stores/Store.ts";
 import "https://deno.land/x/dotenv@v3.2.0/load.ts";
 
 interface User
@@ -21,6 +25,53 @@ interface Room
     "name": string;
 }
 
+interface SessionDoc
+{
+    "id": string;
+    "data": SessionData;
+}
+
+// oak_sessions ships a MongoStore, but it is typed against deno.land/x/mongo and
+// will not take a Db from the official driver. Same document shape as the
+// bundled one, so existing session documents keep working.
+class MongoStore implements Store
+{
+    sessions: Collection<SessionDoc>;
+
+    constructor(db: Db, collectionName = "sessions")
+    {
+        this.sessions = db.collection<SessionDoc>(collectionName);
+    }
+
+    async sessionExists(sessionId: string)
+    {
+        return await this.sessions.findOne({ "id": sessionId }) !== null;
+    }
+
+    async getSessionById(sessionId: string)
+    {
+        const session = await this.sessions.findOne({ "id": sessionId });
+
+        return session ? session.data : null;
+    }
+
+    async createSession(sessionId: string, initialData: SessionData)
+    {
+        await this.persistSessionData(sessionId, initialData);
+    }
+
+    async persistSessionData(sessionId: string, sessionData: SessionData)
+    {
+        await this.sessions.replaceOne({ "id": sessionId }, { "id": sessionId, "data": sessionData }, { upsert: true });
+    }
+
+    async deleteSession(sessionId: string)
+    {
+        await this.sessions.deleteOne({ "id": sessionId });
+    }
+}
+
+// mongodb+srv://<user>:<password>@cluster0.vxvhpav.mongodb.net/?appName=Cluster0
 const uri = Deno.env.get("URI");
 
 if (!uri)
@@ -28,9 +79,28 @@ if (!uri)
     throw new Error("Missing required env var URI");
 }
 
-const client = new MongoClient();
-await client.connect(uri);
-const db = client.database("chat");
+const client = new MongoClient(uri,
+{
+    serverApi:
+    {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    },
+    // Deno Deploy runs many isolates and each one builds its own pool, so the
+    // driver's default of 100 sockets per isolate would eat an Atlas M0's cap.
+    maxPoolSize: 10,
+    maxIdleTimeMS: 60000
+});
+
+// The client is shared by the whole server, so it is never closed — a ping just
+// turns a bad URI or password into a crash at boot instead of a broken request.
+await client.connect();
+await client.db("admin").command({ ping: 1 });
+
+console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+const db = client.db("chat");
 
 const router = new Router();
 router.get("/favicon.ico", favicon);
